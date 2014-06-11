@@ -6,6 +6,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.impressflow.net.Account;
+import com.impressflow.net.Status;
 
 
 public class ReflexServer {
@@ -16,8 +17,11 @@ public class ReflexServer {
 		// TODO Auto-generated constructor stub
 		
 		accounts = new HashMap <Integer, Account>(800);
-	    Server server = new Server();
+	    final Server server = new Server();
+	  
+	    server.getKryo().register(String[].class);
 	    server.getKryo().register(Account.class);
+	    server.getKryo().register(Status.class);
 	    
 	    server.start();
 	    try {
@@ -34,11 +38,17 @@ public class ReflexServer {
 	    		  
 	    		  //Registering new account!
 	              if(object instanceof Account){
-	            	  Account temp = (Account)object;
+	            	  Account temp = (Account) object;
 	            	  System.out.println("Registering new account: " + temp.name);
 	            	  
 	            	  accounts.put(connection.getID(), temp);
 	            	  connection.sendTCP("account registered: " + temp.name + " " + connection.getID());
+	              }
+	              
+	              if(object instanceof Status){
+	            	  Status temp = (Status) object;
+	            	  
+	            	  server.sendToTCP(1, temp);
 	              }
 
 	        }
