@@ -68,6 +68,9 @@ public class ReflexServer {
 	            			  //If this account is not connected AND it is not the account associated with this connection
 	            			  //AND the user must want to connect randomly
 	            			  if(!account.isConnected && account.random && !key.equals(connection.getID())){
+	            				  
+	            				  System.out.println("Success! Connecting " + key + " to " + connection.getID());
+	            				  
 	            				  account.isConnected = true;
 	            				  account.toId = connection.getID();
 	            				  
@@ -76,8 +79,14 @@ public class ReflexServer {
 	            				  account.isConnected = true;
 	            				  account.toId = key;
 	            				  
-	            				  server.sendToTCP(connection.getID(), new Status());
-	            				  server.sendToTCP(key, new Status());
+	            				  Status init = new Status();
+	            				  init.init = true;
+	            				  
+	            				  init.fromId = key;
+	            				  server.sendToTCP(connection.getID(), init);
+	            				  
+	            				  init.fromId = connection.getID();
+	            				  server.sendToTCP(key, init);
 	            				  
 	            				  return;
 	            			  }
