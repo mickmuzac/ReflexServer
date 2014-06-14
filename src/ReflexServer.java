@@ -8,10 +8,11 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.impressflow.net.Account;
 import com.impressflow.net.ConnectionRequest;
+import com.impressflow.net.PetInfo;
 import com.impressflow.net.Status;
 
 
-public class ReflexServer {
+public class ReflexServer extends Server {
 	
 	HashMap <Integer, Account> accounts;
 	
@@ -19,21 +20,21 @@ public class ReflexServer {
 		// TODO Auto-generated constructor stub
 		
 		accounts = new HashMap <Integer, Account>(800);
-	    final Server server = new Server();
 	  
-	    server.getKryo().register(String[].class);
-	    server.getKryo().register(Account.class);
-	    server.getKryo().register(Status.class);
-	    server.getKryo().register(ConnectionRequest.class);
+	    getKryo().register(String[].class);
+	    getKryo().register(Account.class);
+	    getKryo().register(Status.class);
+	    getKryo().register(ConnectionRequest.class);
+	    getKryo().register(PetInfo.class);
 	    
-	    server.start();
+	    start();
 	    try {
-			server.bind(3000);
+			bind(3000);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	    
-	    server.addListener(new Listener() {
+	    addListener(new Listener() {
 	    	
 	    	@Override
 	        public void received (Connection connection, Object object) {
@@ -41,7 +42,12 @@ public class ReflexServer {
 	              if(object instanceof Status){
 	            	  //If we get a status, blindly forward it
 	            	  Status temp = (Status) object;
-	            	  server.sendToTCP(temp.toId, temp);
+	            	  sendToTCP(temp.toId, temp);
+	              }
+	              
+	              else if(object instanceof PetInfo){
+	            	  PetInfo temp = (PetInfo) object;
+	            	  sendToTCP(temp.toId, temp);
 	              }
 	    		
 	    		  //Registering new account!
@@ -83,10 +89,10 @@ public class ReflexServer {
 	            				  init.init = true;
 	            				  
 	            				  init.fromId = key;
-	            				  server.sendToTCP(connection.getID(), init);
+	            				  sendToTCP(connection.getID(), init);
 	            				  
 	            				  init.fromId = connection.getID();
-	            				  server.sendToTCP(key, init);
+	            				  sendToTCP(key, init);
 	            				  
 	            				  return;
 	            			  }
