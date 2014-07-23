@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import com.badlogic.gdx.graphics.Color;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
@@ -22,6 +23,8 @@ public class ReflexServer extends Server {
 		accounts = new HashMap <Integer, Account>(800);
 	  
 	    getKryo().register(String[].class);
+	    getKryo().register(Color.class);
+	    
 	    getKryo().register(Account.class);
 	    getKryo().register(Status.class);
 	    getKryo().register(ConnectionRequest.class);
@@ -92,6 +95,7 @@ public class ReflexServer extends Server {
 	            				  sendToTCP(connection.getID(), init);
 	            				  
 	            				  init.fromId = connection.getID();
+	            				  init.isHost = true;
 	            				  sendToTCP(key, init);
 	            				  
 	            				  return;
