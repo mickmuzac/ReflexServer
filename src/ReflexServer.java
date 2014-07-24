@@ -7,9 +7,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import com.impressflow.level.LevelDefinition.World;
 import com.impressflow.net.Account;
 import com.impressflow.net.ConnectionRequest;
 import com.impressflow.net.PetInfo;
+import com.impressflow.net.PlayInfo;
 import com.impressflow.net.Status;
 
 
@@ -24,6 +26,7 @@ public class ReflexServer extends Server {
 	  
 	    getKryo().register(String[].class);
 	    getKryo().register(Color.class);
+	    getKryo().register(PlayInfo.class);
 	    
 	    getKryo().register(Account.class);
 	    getKryo().register(Status.class);
@@ -45,6 +48,12 @@ public class ReflexServer extends Server {
 	              if(object instanceof Status){
 	            	  //If we get a status, blindly forward it
 	            	  Status temp = (Status) object;
+	            	  sendToTCP(temp.toId, temp);
+	              }
+	              
+	              else if(object instanceof PlayInfo){
+	            	  //If we get a PlayInfo, blindly forward it
+	            	  PlayInfo temp = (PlayInfo) object;
 	            	  sendToTCP(temp.toId, temp);
 	              }
 	              
