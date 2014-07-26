@@ -121,8 +121,11 @@ public class ReflexServer extends Server {
 	    	@Override
 	    	public void disconnected(Connection connection){
 	    		Account account = accounts.get(connection.getID());
+	    		if(account == null){
+	    			return;
+	    		}
 	    		
-	    		if(account.toId >= 0){
+	    		else if(account.toId >= 0){
 	    			sendToTCP(account.toId, "remoteDisconnect");
 	    			
 	    			Account remote = accounts.get(account.toId);
