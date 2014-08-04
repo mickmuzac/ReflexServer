@@ -64,6 +64,8 @@ public class ReflexServer extends Server {
 	    		
 	    		  //Registering new account!
 	              else if(object instanceof Account){
+	            	  resetConnection(connection);
+	            	  
 	            	  Account temp = (Account) object;
 	            	  System.out.println("Registering new account: " + temp.emails);
 	            	  
@@ -120,23 +122,32 @@ public class ReflexServer extends Server {
 	    	
 	    	@Override
 	    	public void disconnected(Connection connection){
-	    		Account account = accounts.get(connection.getID());
-	    		if(account == null){
-	    			return;
-	    		}
-	    		
-	    		else if(account.toId >= 0){
-	    			sendToTCP(account.toId, "remoteDisconnect");
-	    			
-	    			Account remote = accounts.get(account.toId);
-	    			remote.toId = -1;
-	    			remote.isConnected = false;	    			
-	    		}
-	    		
-	    		accounts.remove(connection.getID());
-	    		account.toId = -1;
+	    		resetConnection(connection);
 	    	}
 	     });
+
+	}
+	
+	public void resetConnection(Connection connection){
+		Account account = accounts.get(connection.getID());
+		if(account == null){
+			return;
+		}
+		
+		else if(account.toId >= 0){
+			sendToTCP(account.toId, "remoteDisconnect");
+			
+			Account remote = accounts.get(account.toId);
+			
+			System.out.println("Received disconnect from: " + connection.getID());
+			System.out.println("Disconnecting this client from: " + account.toId);
+			
+			remote.toId = -1;
+			remote.isConnected = false;	    			
+		}
+		
+		accounts.remove(connection.getID());
+		account.toId = -1;
 	}
 
 	/**
