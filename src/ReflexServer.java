@@ -76,6 +76,10 @@ public class ReflexServer extends Server {
 	              else if(object instanceof ConnectionRequest){
 	            	  ConnectionRequest temp = (ConnectionRequest) object;
 	            	  System.out.println("Received connection request from: " + connection.getID());
+	            	  
+	            	  Account incoming = accounts.get(connection.getID());
+	            	  incoming.ready = true;
+	            	  
 	            	  if(temp.random == true){
 	            		  
 	            		  System.out.println("Random is true");
@@ -87,7 +91,7 @@ public class ReflexServer extends Server {
 	            			  
 	            			  //If this account is not connected AND it is not the account associated with this connection
 	            			  //AND the user must want to connect randomly
-	            			  if(!account.isConnected && account.random && !key.equals(connection.getID())){
+	            			  if(account.ready && !account.isConnected && account.random && !key.equals(connection.getID())){
 	            				  
 	            				  System.out.println("Success! Connecting " + key + " to " + connection.getID());
 	            				  
@@ -116,7 +120,13 @@ public class ReflexServer extends Server {
 	            	  
 	            	  else{}
 	              }
-
+	              else if(object instanceof String){
+	            	  String str = (String) object;
+	            	  Account account = accounts.get(connection.getID());
+	            	  if(str.equals("ready") && account != null){
+	            		  account.ready = true;
+	            	  }
+	              }
 
 	        }
 	    	
@@ -143,11 +153,13 @@ public class ReflexServer extends Server {
 			System.out.println("Disconnecting this client from: " + account.toId);
 			
 			remote.toId = -1;
-			remote.isConnected = false;	    			
+			remote.isConnected = false;	
+			remote.ready = false;			
 		}
 		
 		accounts.remove(connection.getID());
 		account.toId = -1;
+		account.ready = false;
 	}
 
 	/**
